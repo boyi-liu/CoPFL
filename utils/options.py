@@ -25,11 +25,6 @@ def args_parser():
     parser.add_argument('--lr', type=float, help="Learning rate")
     parser.add_argument('--gamma', type=float, help="Exponential decay of learning rate")
 
-    # ===== System Heterogeneity Setting =====
-    parser.add_argument('--delay', type=int, default=5, help="Delay level used to simulate latency of device")
-    parser.add_argument('--delay_rate', type=float, default=0.3, help="Proportion of stale device")
-
-
     # === read specific parameters from each method
     args, _ = parser.parse_known_args()
     alg_module = importlib.import_module(f'alg.{args.alg}')

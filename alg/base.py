@@ -48,7 +48,6 @@ class BaseClient():
             )
 
         self.training_time = None
-        self.delay = args.delay if self.id < (args.total_num * args.delay_rate) else 1
 
     def run(self):
         raise NotImplementedError
