@@ -24,7 +24,6 @@ class Client(BaseClient):
     def train(self):
         gm = self.model2tensor() # this is only param.data, without grad
         total_loss = 0.0
-        batch_loss = []
         for epoch in range(self.epoch):
             for idx, data in enumerate(self.loader_train):
                 X, y = self.preprocess(data)
