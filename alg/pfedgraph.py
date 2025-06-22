@@ -101,7 +101,6 @@ class Server(BaseServer):
                                A @ x == b])
             prob.solve()
             self.graph_w[idx] = torch.Tensor(x.value)
-            self.graph_w[:, idx] = torch.Tensor(x.value)
 
     def aggregate(self):
         for idx, client in enumerate(self.sampled_clients):
