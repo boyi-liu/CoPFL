@@ -3,9 +3,11 @@ import torch
 import cvxpy as cp
 
 from alg.base import BaseClient, BaseServer
+from utils.time_utils import time_record
+
 
 def add_args(parser):
-    parser.add_argument('--alpha', type=float, default=0.8, help="Alpha in weight optimization")
+    parser.add_argument('--alpha', type=float, default=1.5, help="Alpha in weight optimization")
     parser.add_argument('--lam', type=float, default=0.01, help="Lambda in local training")
     return parser.parse_args()
 
@@ -14,6 +16,7 @@ class Client(BaseClient):
         super().__init__(id, args)
         self.lam = args.lam
 
+    @time_record
     def run(self):
         self.train()
 
@@ -25,8 +28,8 @@ class Client(BaseClient):
         w_last = self.model2tensor()
 
         total_loss = 0.0
-        for epoch in range(self.epoch):
-            for idx, data in enumerate(self.loader_train):
+        for _ in range(self.epoch):
+            for data in self.loader_train:
                 X, y = self.preprocess(data)
                 preds = self.model(X)
 
@@ -40,7 +43,7 @@ class Client(BaseClient):
                 self.optim.step()
                 total_loss += loss.item()
 
-        self.metric['loss'] = total_loss / len(self.loader_train)
+        self.metric['loss'].append(total_loss / len(self.loader_train))
 
 
 class Server(BaseServer):
@@ -72,7 +75,7 @@ class Server(BaseServer):
             for c_j in self.clients:
                 idx_i = c_i.id
                 idx_j = c_j.id
-                self.sims[idx_i, idx_j] = self.sims[idx_j, idx_i] = -torch.nn.functional.cosine_similarity(
+                self.sims[idx_i, idx_j] = self.sims[idx_j, idx_i] = torch.nn.functional.cosine_similarity(
                     self.client_models[idx_i],
                     self.client_models[idx_j],
                     dim=0)
@@ -85,16 +88,15 @@ class Server(BaseServer):
         for idx, c in enumerate(self.sampled_clients):
             sims = self.sims[c.id]
             n = len(self.clients)
-
             p = np.array(w_all)
-            P = self.alpha * np.identity(n)
+            P = np.identity(n)
             P = cp.atoms.affine.wraps.psd_wrap(P)
             G = - np.identity(n)
             h = np.zeros(n)
             A = np.ones((1, n))
             b = np.ones(1)
-            d =  sims
-            q = d - 2 * self.alpha * p
+            d = sims
+            q = - d * self.alpha - 2 * p
             x = cp.Variable(n)
             prob = cp.Problem(cp.Minimize(cp.quad_form(x, P) + q.T @ x),
                               [G @ x <= h,
@@ -103,8 +105,8 @@ class Server(BaseServer):
             self.graph_w[idx] = torch.Tensor(x.value)
 
     def aggregate(self):
-        for idx, client in enumerate(self.sampled_clients):
-            w_aggr = self.graph_w[client.id]
-            aggr_tensor = sum([w * tensor for w, tensor in zip(w_aggr, self.client_models)])
+        res = [sum([w * tensor for w, tensor in zip(self.graph_w[c.id], self.client_models)])
+               for c in self.sampled_clients]
 
+        for client, aggr_tensor in zip(self.clients, res):
             self.client_models[client.id] = aggr_tensor
