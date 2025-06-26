@@ -26,7 +26,7 @@ class Client(BaseClient):
 
         total_loss = 0.0
         for _ in range(self.epoch):
-            for idx, data in enumerate(self.loader_train):
+            for data in self.loader_train:
                 X, y = self.preprocess(data)
                 preds = self.model(X)
 
@@ -77,6 +77,7 @@ class Server(BaseServer):
                                                                                                           dim=0)
 
     def aggregate(self):
+        res = []
         for idx, c in enumerate(self.sampled_clients):
             w_aggr = self.sims[c.id]
 
@@ -84,6 +85,7 @@ class Server(BaseServer):
             w_aggr /= (torch.sum(w_aggr)-w_aggr[idx])
             w_aggr *= (1-self.xiii)
             w_aggr[idx] = self.xiii
-            aggr_tensor = sum([w * tensor for w, tensor in zip(w_aggr, self.client_models)])
+            res.append(sum([w * tensor for w, tensor in zip(w_aggr, self.client_models)]))
 
+        for c, aggr_tensor in zip(self.sampled_clients, res):
             self.client_models[c.id] = aggr_tensor
