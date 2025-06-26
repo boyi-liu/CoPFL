@@ -56,8 +56,8 @@ class BaseClient():
         # === train ===
         total_loss = 0.0
 
-        for epoch in range(self.epoch):
-            for idx, data in enumerate(self.loader_train):
+        for _ in range(self.epoch):
+            for data in enumerate(self.loader_train):
                 X, y = self.preprocess(data)
                 preds = self.model(X)
                 loss = self.loss_func(preds, y)
