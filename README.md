@@ -1,6 +1,7 @@
 # Co-PFL
 
-An easy-to-use Co-PFL research platform.
+🔥 _**Collaboration-based PFL (Co-PFL)**_ research platform.
+
 
 
 ## Guidance
@@ -58,7 +59,9 @@ def add_args(parser):
 
 #### Step 2.4 Implement your algorithms
 
-> ‼️NOTE: We claim that each algorithm should **overwrite the function** `run()`, because it stands for the main workflow of your algorithm.
+> ‼️ We claim that each algorithm should **overwrite the function** `run()`, because it stands for the main workflow of your algorithm.
+>
+> 💡***You can overwrite or add any function as you want then!***
 
 The `run()` follows a basic pipeline of:
 
@@ -80,7 +83,7 @@ class Server(BaseServer):
         self.aggregate()
 ```
 
-💡***You can overwrite or add any function as you want then!***
+>NOTE:  `@time_record` is a decorator which is defined in `utils/time_utils.py` to measure the training time.
 
 
 
@@ -103,6 +106,6 @@ There are three places to config your hyperparameters:
 #### Step 3.2 Run your code!
 
 ```bash
-python main.py --{your args1} {your args1's value} --{your args2} {your args2's value}
+python main.py --{your args1} {your args1's value} --{your args2} {your args2's value} ... --{your args-n} {your args-n's value}
 ```
 
