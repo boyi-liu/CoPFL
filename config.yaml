@@ -1,5 +1,5 @@
 # basic config
-alg: asofed
+alg: fedavg
 suffix: default
 device: 1
 dataset: mnist
