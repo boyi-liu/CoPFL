@@ -57,7 +57,7 @@ class BaseClient():
         total_loss = 0.0
 
         for _ in range(self.epoch):
-            for data in enumerate(self.loader_train):
+            for data in self.loader_train:
                 X, y = self.preprocess(data)
                 preds = self.model(X)
                 loss = self.loss_func(preds, y)
@@ -101,7 +101,7 @@ class BaseClient():
         if not decay:
             return
         for param_group in self.optim.param_groups:
-            param_group['lr'] =  self.lr * (self.args.gamma ** self.server.round)
+            param_group['lr'] =  self.lr * (self.args.lr_decay ** self.server.round)
 
     def model2tensor(self, params=None):
         alg_module = importlib.import_module(f'alg.{self.args.alg}')
