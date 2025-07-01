@@ -18,11 +18,12 @@ class Client(BaseClient):
         self.train()
 
     def clone_model(self, target):
-        p_tensor = target.client_models[self.id]
-        self.tensor2model(p_tensor)
+        # p_tensor = target.client_models[self.id]
+        # self.tensor2model(p_tensor)
+        pass
 
     def train(self):
-        w_last = self.model2tensor()
+        w_last = self.server.client_models[self.id]
 
         total_loss = 0.0
         for _ in range(self.epoch):
