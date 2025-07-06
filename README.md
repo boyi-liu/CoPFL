@@ -2,110 +2,19 @@
 
 🔥 _**Collaboration-based PFL (Co-PFL)**_ research platform.
 
+## Supported Algorithms
+#### Generic FL
++ **FedAvg**, [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://proceedings.mlr.press/v54/mcmahan17a/mcmahan17a.pdf), *AISTATS 2017*
++ **FedProx**, [Federated Optimization in Heterogeneous Networks](https://proceedings.mlsys.org/paper_files/paper/2020/file/1f5fe83998a09396ebe6477d9475ba0c-Paper.pdf), *MLSys 2020*
++ **MOON**, [Model Contrastive Federated Learning](https://openaccess.thecvf.com/content/CVPR2021/papers/Li_Model-Contrastive_Federated_Learning_CVPR_2021_paper.pdf), *CVPR 2021*
+#### Collaboration-based PFL
++ **CFL**, [Clustered Federated Learning: Model-Agnostic Distributed Multitask Optimization Under Privacy Constraints](https://ieeexplore.ieee.org/document/9174890?denied=), _TNNLS 2020_ 
++ **IFCA**, [An Efficient Framework for Clustered Federated Learning](https://papers.neurips.cc/paper_files/paper/2020/file/e32cc80bf07915058ce90722ee17bb71-Paper.pdf), _NeurIPS 2020_
++ **FedAMP**, [Personalized Cross-Silo Federated Learning on Non-IID Data](https://ojs.aaai.org/index.php/AAAI/article/view/16960), _AAAI 2021_
++ **pFedGraph**, [Personalized Federated Learning with Inferred Collaboration Graphs](https://openreview.net/forum?id=33fj5Ph3ot) _ICML 2023_
++ **FedSaC**, [Balancing Similarity and Complementarity for Federated Learning](https://arxiv.org/abs/2405.09892), _ICML 2024_
 
 
 ## Guidance
 
-### Step 1: Prepare your data
-
-You only need to tune `dataset/config.yaml` to modify the config.
-
-Then you can run dataset-specific file to generate dataset.
-
-```bash
-python generate_mnist.py
-```
-
-
-
-### Step 2: Implement your algorithm 
-
-#### Step 2.1 Create your file
-
-Create a new file `{NAME}.py` inside the path `alg`.
-
-
-
-#### Step 2.2 Extend the basic Client and Server
-
-Extend the Client and Server class in `alg/base.py`:
-
-```python
-from alg.base import BaseServer, BaseClient
-
-class Client(BaseClient):
-    def __init__(self, id, args):
-        super().__init__(id, args)
-
-class Server(BaseServer):
-    def __init__(self, id, args, clients):
-        super().__init__(id, args, clients)
-```
-
-
-#### Step 2.3 Config your algorithm-specific hyperparameters
-
-And all **general** args could be found in `utils/options.py`.
-
-For **algorithm-specific** hyperparameters, it is recommended to add a `add_args()` function inside your file.
-
-```python
-def add_args(parser):
-    parser.add_argument('--{your_param}', type=int, default=1)
-    return parser.parse_args()
-```
-
-
-
-#### Step 2.4 Implement your algorithms
-
-> ‼️ We claim that each algorithm should **overwrite the function** `run()`, because it stands for the main workflow of your algorithm.
->
-> 💡***You can overwrite or add any function as you want then!***
-
-The `run()` follows a basic pipeline of:
-
-```python
-from alg.base import BaseServer, BaseClient
-from utils.time_utils import time_record
-
-class Client(BaseClient):
-    @time_record
-    def run(self):
-        self.train()
-
-class Server(BaseServer):
-    def run(self):
-        self.sample()
-        self.downlink()
-        self.client_update()
-        self.uplink()
-        self.aggregate()
-```
-
->NOTE:  `@time_record` is a decorator which is defined in `utils/time_utils.py` to measure the training time.
-
-
-
-### Step 3: Run your code!
-
-Now it is time to run your code!
-
-#### Step 3.1: Config your hyperparamters
-
-There are three places to config your hyperparameters:
-
-+ ⭐️⭐️⭐️ Highest priority: Your bash to run the code, for example, `python main.py --total_num 10`
-+ ⭐️⭐️ Medium priority: The content in `config.yaml`
-+ ⭐️ Lowest priority: The default setup in `utils/options.py`
-
->  The priority means that, if you change `total_num` to `10` in your bash, it will **overwrite** that in `config.yaml` and `utils/options.py`.
-
-
-
-#### Step 3.2 Run your code!
-
-```bash
-python main.py --{your args1} {your args1's value} --{your args2} {your args2's value} ... --{your args-n} {your args-n's value}
-```
-
+Please refer to https://github.com/boyi-liu/AsyncFL-Platform.
