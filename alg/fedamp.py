@@ -1,5 +1,5 @@
 import torch
-
+from utils.time_utils import time_record
 from alg.base import BaseClient, BaseServer
 
 def add_args(parser):
@@ -10,6 +10,7 @@ def add_args(parser):
 
 
 class Client(BaseClient):
+    @time_record
     def __init__(self, id, args):
         super().__init__(id, args)
         self.lam = args.lam
