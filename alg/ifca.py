@@ -9,6 +9,7 @@ from utils.time_utils import time_record
 
 def add_args(parser):
     parser.add_argument('--proxy_prop', type=float, default=0.1)
+    parser.add_argument('--cluster_num', type=int, default=4)
     return parser.parse_args()
 
 class Client(ClusterClient):
@@ -44,7 +45,7 @@ class Client(ClusterClient):
             self.tensor2model(c_tensor)
 
             total_loss = 0.0
-            for data in enumerate(self.proxy_loader):
+            for data in self.proxy_loader:
                 X, y = self.preprocess(data)
                 preds = self.model(X)
                 loss = self.loss_func(preds, y)

@@ -10,7 +10,7 @@ class ClusterClient(BaseClient):
 
     def clone_model(self, target):
         target_cluster = target.cluster_list[self.cluster_id]
-        p_tensor = target_cluster.model_tensor
+        p_tensor = target_cluster.model
         self.tensor2model(p_tensor)
 
 
@@ -21,7 +21,6 @@ class ClusterServer(BaseServer):
         self.cluster_num = args.cluster_num if 'cluster_num' in args.__dict__ else 1
         assert self.cluster_num > 0
         self.cluster_list = [Cluster(idx, self.model2tensor()) for idx in range(self.cluster_num)]
-        # self.cluster_list[0].clients = [idx for idx in range(self.client_num)]
 
     def uplink(self):
         assert (len(self.sampled_clients) > 0)
@@ -39,13 +38,12 @@ class ClusterServer(BaseServer):
             weights = [len(client.dataset_train) / total_samples for client in self.sampled_clients if client.cluster_id == cluster.id]
 
             cluster.received_params = [params * weight for weight, params in zip(weights, cluster.received_params)]
-            avg_tensor = sum(cluster.received_params)
-            cluster.model_tensor = avg_tensor
+            if len(cluster.received_params) != 0:
+                cluster.model = sum(cluster.received_params)
 
 
 class Cluster:
     def __init__(self, id, model):
         self.id = id
-        self.clients = []
         self.model = model
         self.received_params = []
