@@ -18,10 +18,10 @@ class ClusterServer(BaseServer):
     def __init__(self, id, args, clients):
         super().__init__(id, args, clients)
 
-        self.cluster_num = args.cluster_num
+        self.cluster_num = args.cluster_num if 'cluster_num' in args.__dict__ else 1
         assert self.cluster_num > 0
         self.cluster_list = [Cluster(idx, self.model2tensor()) for idx in range(self.cluster_num)]
-        self.cluster_list[0].clients = [idx for idx in range(self.client_num)]
+        # self.cluster_list[0].clients = [idx for idx in range(self.client_num)]
 
     def uplink(self):
         assert (len(self.sampled_clients) > 0)
@@ -44,8 +44,8 @@ class ClusterServer(BaseServer):
 
 
 class Cluster:
-    def __init__(self, id, model_tensor):
+    def __init__(self, id, model):
         self.id = id
         self.clients = []
-        self.model = model_tensor
+        self.model = model
         self.received_params = []
